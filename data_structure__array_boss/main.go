@@ -10,6 +10,10 @@ import (
 )
 
 func main() {
+	solve()
+}
+
+func solve() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	line1 := strings.Split(scanner.Text(), " ")
