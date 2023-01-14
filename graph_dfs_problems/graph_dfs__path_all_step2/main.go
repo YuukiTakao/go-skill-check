@@ -4,15 +4,14 @@ import (
 	"fmt"
 )
 
-func graph_walk_dfs(n, s, k int, adlist *map[int][]int) [][]int {
+func graph_walk_dfs_k_moves(start, k int, adlist *map[int][]int) [][]int {
 	routes := make([][]int, 0, 2)
 	walk := make([]int, 0, 2)
-	walk = append(walk, s)
-	dfs(k, s, &routes, &walk, adlist)
+	walk = append(walk, start)
+	dfs(start, k, &routes, &walk, adlist)
 	return routes
 }
-
-func dfs(k, position int, routes *[][]int, walk *[]int, adlist *map[int][]int) {
+func dfs(position, k int, routes *[][]int, walk *[]int, adlist *map[int][]int) {
 	if k == 0 {
 		tmp := make([]int, len(*walk))
 		copy(tmp, *walk)
@@ -22,7 +21,7 @@ func dfs(k, position int, routes *[][]int, walk *[]int, adlist *map[int][]int) {
 		twalk := *walk
 		for _, v := range tadlist[position-1] {
 			twalk = append(twalk, v)
-			dfs(k-1, v, routes, &twalk, adlist)
+			dfs(v, k-1, routes, &twalk, adlist)
 			twalk = twalk[:len(twalk)-1]
 		}
 	}
@@ -40,11 +39,15 @@ func print_2dslice_with_space(s2d [][]int) {
 	}
 }
 
+func init_adlist(v_count int) map[int][]int {
+	return make(map[int][]int, v_count+1)
+}
+
 func main() {
 	var n, s, k int
-	fmt.Scanf("%d %d %d", &n, &s, &k)
+	fmt.Scan(&n, &s, &k)
 
-	adlist := make(map[int][]int, n+1)
+	adlist := init_adlist(n)
 
 	var v, a int
 	for i := 0; i < n; i++ {
@@ -57,7 +60,7 @@ func main() {
 		}
 		adlist[i] = as
 	}
-	routes := graph_walk_dfs(n, s, k, &adlist)
+	routes := graph_walk_dfs_k_moves(s, k, &adlist)
 
 	fmt.Printf("%d\n", len(routes))
 	print_2dslice_with_space(routes)
