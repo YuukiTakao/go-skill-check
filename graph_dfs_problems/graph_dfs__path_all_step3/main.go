@@ -36,19 +36,19 @@ func (al adList) printWithSpace() {
 		fmt.Printf("\n")
 	}
 }
-func (al *adList) walkGraphDfsInKMoves(start, k int) [][]int {
+func (al *adList) walkGraphDfsInKMoves(start, k int, isUnique bool) [][]int {
 	al.path = append(al.path, start)
-	al.dfs(start, k)
+	al.dfs(start, k, isUnique)
 	return al.paths
 }
-func (al *adList) dfs(position, k int) {
+func (al *adList) dfs(position, k int, isUnique bool) {
 	if k == 0 {
 		al.appendPaths()
 	} else {
 		for _, v := range al.l[position-1] {
-			if !inSlice(al.path, v) {
+			if !inSlice(al.path, v) || !isUnique {
 				al.path = append(al.path, v)
-				al.dfs(v, k-1)
+				al.dfs(v, k-1, isUnique)
 				al.path = al.path[:len(al.path)-1]
 			}
 		}
@@ -90,7 +90,7 @@ func main() {
 		adlist.l[i] = a
 	}
 	// adlist.print_with_space()
-	paths := adlist.walkGraphDfsInKMoves(s, k)
+	paths := adlist.walkGraphDfsInKMoves(s, k, true)
 	fmt.Printf("%d\n", len(paths))
 	printWithSpace(paths)
 }

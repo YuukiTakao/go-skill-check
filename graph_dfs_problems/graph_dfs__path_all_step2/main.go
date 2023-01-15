@@ -34,24 +34,32 @@ func (al adList) print_with_space() {
 		fmt.Printf("\n")
 	}
 }
-
-func (al *adList) graph_walk_dfs_k_moves(start, k int) [][]int {
+func inSlice(slice []int, target int) bool {
+	for _, num := range slice {
+		if num == target {
+			return true
+		}
+	}
+	return false
+}
+func (al *adList) walkGraphDfsInKMoves(start, k int, isUnique bool) [][]int {
 	al.path = append(al.path, start)
-	al.dfs(start, k)
+	al.dfs(start, k, isUnique)
 	return al.paths
 }
-func (al *adList) dfs(position, k int) {
+func (al *adList) dfs(position, k int, isUnique bool) {
 	if k == 0 {
 		al.appendPaths()
 	} else {
 		for _, v := range al.l[position-1] {
-			al.path = append(al.path, v)
-			al.dfs(v, k-1)
-			al.path = al.path[:len(al.path)-1]
+			if !inSlice(al.path, v) || !isUnique {
+				al.path = append(al.path, v)
+				al.dfs(v, k-1, isUnique)
+				al.path = al.path[:len(al.path)-1]
+			}
 		}
 	}
 }
-
 func print_2dslice_with_space(tds [][]int) {
 	for _, s := range tds {
 		for j, v := range s {
@@ -81,7 +89,7 @@ func main() {
 		}
 		adlist.l[i] = as
 	}
-	paths := adlist.graph_walk_dfs_k_moves(s, k)
+	paths := adlist.walkGraphDfsInKMoves(s, k, false)
 
 	fmt.Printf("%d\n", len(paths))
 	print_2dslice_with_space(paths)
