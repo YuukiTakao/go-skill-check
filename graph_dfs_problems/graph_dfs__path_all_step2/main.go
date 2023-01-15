@@ -4,32 +4,28 @@ import (
 	"fmt"
 )
 
-func graph_walk_dfs_k_moves(start, k int, adlist *map[int][]int) [][]int {
-	routes := make([][]int, 0, 2)
-	walk := make([]int, 0, 2)
-	walk = append(walk, start)
-	dfs(start, k, &routes, &walk, adlist)
-	return routes
-}
-func dfs(position, k int, routes *[][]int, walk *[]int, adlist *map[int][]int) {
-	if k == 0 {
-		tmp := make([]int, len(*walk))
-		copy(tmp, *walk)
-		*routes = append(*routes, tmp)
-	} else {
-		tadlist := *adlist
-		twalk := *walk
-		for _, v := range tadlist[position-1] {
-			twalk = append(twalk, v)
-			dfs(v, k-1, routes, &twalk, adlist)
-			twalk = twalk[:len(twalk)-1]
-		}
-	}
+type adList struct {
+	l     map[int][]int
+	paths [][]int
+	path  []int
 }
 
-func print_2dslice_with_space(s2d [][]int) {
-	for _, s := range s2d {
-		for j, v := range s {
+func init_adlist(v_count int) adList {
+	return adList{
+		l:     make(map[int][]int, v_count+1),
+		paths: make([][]int, 0, 2),
+		path:  make([]int, 0, 2),
+	}
+}
+func (al *adList) appendPaths() {
+	tmp := make([]int, len(al.path))
+	copy(tmp, al.path)
+	al.paths = append(al.paths, tmp)
+}
+
+func (al adList) print_with_space() {
+	for _, l := range al.l {
+		for j, v := range l {
 			if j >= 1 {
 				fmt.Printf(" ")
 			}
@@ -39,8 +35,33 @@ func print_2dslice_with_space(s2d [][]int) {
 	}
 }
 
-func init_adlist(v_count int) map[int][]int {
-	return make(map[int][]int, v_count+1)
+func (al *adList) graph_walk_dfs_k_moves(start, k int) [][]int {
+	al.path = append(al.path, start)
+	al.dfs(start, k)
+	return al.paths
+}
+func (al *adList) dfs(position, k int) {
+	if k == 0 {
+		al.appendPaths()
+	} else {
+		for _, v := range al.l[position-1] {
+			al.path = append(al.path, v)
+			al.dfs(v, k-1)
+			al.path = al.path[:len(al.path)-1]
+		}
+	}
+}
+
+func print_2dslice_with_space(tds [][]int) {
+	for _, s := range tds {
+		for j, v := range s {
+			if j >= 1 {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("%d", v)
+		}
+		fmt.Printf("\n")
+	}
 }
 
 func main() {
@@ -58,10 +79,10 @@ func main() {
 			fmt.Scanf("%d", &a)
 			as = append(as, a)
 		}
-		adlist[i] = as
+		adlist.l[i] = as
 	}
-	routes := graph_walk_dfs_k_moves(s, k, &adlist)
+	paths := adlist.graph_walk_dfs_k_moves(s, k)
 
-	fmt.Printf("%d\n", len(routes))
-	print_2dslice_with_space(routes)
+	fmt.Printf("%d\n", len(paths))
+	print_2dslice_with_space(paths)
 }
