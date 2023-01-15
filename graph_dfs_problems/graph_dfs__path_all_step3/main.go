@@ -8,49 +8,62 @@ import (
 )
 
 type adList struct {
-	l      map[int][]int
-	routes [][]int
-	walk   []int
+	l     map[int][]int
+	paths [][]int
+	path  []int
 }
 
-func (al *adList) graph_walk_dfs_k_moves(start, k int) [][]int {
-	al.walk = append(al.walk, start)
+func initAdlist(v_count int) adList {
+	return adList{
+		l:     make(map[int][]int, v_count+1),
+		paths: make([][]int, 0, 2),
+		path:  make([]int, 0, 2),
+	}
+}
+func (al *adList) appendPaths() {
+	tmp := make([]int, len(al.path))
+	copy(tmp, al.path)
+	al.paths = append(al.paths, tmp)
+}
+func (al adList) printWithSpace() {
+	for _, l := range al.l {
+		for j, v := range l {
+			if j >= 1 {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("%d", v)
+		}
+		fmt.Printf("\n")
+	}
+}
+func (al *adList) walkGraphDfsInKMoves(start, k int) [][]int {
+	al.path = append(al.path, start)
 	al.dfs(start, k)
-	return al.routes
+	return al.paths
 }
 func (al *adList) dfs(position, k int) {
 	if k == 0 {
-		tmp := make([]int, len(al.walk))
-		copy(tmp, al.walk)
-		al.routes = append(al.routes, tmp)
+		al.appendPaths()
 	} else {
-		// twalk := *walk
 		for _, v := range al.l[position-1] {
-			al.walk = append(al.walk, v)
-			al.dfs(v, k-1)
-			al.walk = al.walk[:len(al.walk)-1]
+			if !inSlice(al.path, v) {
+				al.path = append(al.path, v)
+				al.dfs(v, k-1)
+				al.path = al.path[:len(al.path)-1]
+			}
 		}
 	}
 }
-func init_adlist(v_count int) adList {
-	return adList{
-		l:      make(map[int][]int, v_count+1),
-		routes: make([][]int, 0, 2),
-		walk:   make([]int, 0, 2),
+func inSlice(slice []int, target int) bool {
+	for _, num := range slice {
+		if num == target {
+			return true
+		}
 	}
+	return false
 }
-
-type tdiSlice struct {
-	sl [][]int
-}
-
-func init_tdislice(count int) tdiSlice {
-	return tdiSlice{
-		sl: make([][]int, count),
-	}
-}
-func (t tdiSlice) print_2dslice_with_space(s2d [][]int) {
-	for _, s := range t.sl {
+func printWithSpace(s2d [][]int) {
+	for _, s := range s2d {
 		for j, v := range s {
 			if j >= 1 {
 				fmt.Printf(" ")
@@ -65,9 +78,9 @@ func main() {
 	n := scanInt()
 	s := scanInt()
 	k := scanInt()
-	fmt.Printf("%d %d %d\n", n, s, k)
+	// fmt.Printf("%d %d %d\n", n, s, k)
 
-	adlist := init_adlist(n)
+	adlist := initAdlist(n)
 	for i := 0; i < n; i++ {
 		v := scanInt()
 		a := make([]int, v)
@@ -76,8 +89,10 @@ func main() {
 		}
 		adlist.l[i] = a
 	}
-
-	adlist.print_with_space()
+	// adlist.print_with_space()
+	paths := adlist.walkGraphDfsInKMoves(s, k)
+	fmt.Printf("%d\n", len(paths))
+	printWithSpace(paths)
 }
 
 var sc = bufio.NewScanner(os.Stdin)
