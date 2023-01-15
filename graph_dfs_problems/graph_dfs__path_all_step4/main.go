@@ -36,6 +36,43 @@ func (al adList) printWithSpace() {
 		fmt.Printf("\n")
 	}
 }
+func inSlice(slice []int, target int) bool {
+	for _, num := range slice {
+		if num == target {
+			return true
+		}
+	}
+	return false
+}
+func (al *adList) walkGraphDfsStartToGoal(start, goal int, isUnique bool) [][]int {
+	al.path = append(al.path, start)
+	al.dfs(start, goal, isUnique)
+	return al.paths
+}
+func (al *adList) dfs(position, goal int, isUnique bool) {
+	for _, v := range al.l[position-1] {
+		if !inSlice(al.path, v) || !isUnique {
+			al.path = append(al.path, v)
+			if v == goal {
+				al.appendPaths()
+			} else {
+				al.dfs(v, goal, isUnique)
+			}
+			al.path = al.path[:len(al.path)-1]
+		}
+	}
+}
+func printWithSpace(s2d [][]int) {
+	for _, s := range s2d {
+		for j, v := range s {
+			if j >= 1 {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("%d", v)
+		}
+		fmt.Printf("\n")
+	}
+}
 func main() {
 	sc.Split(bufio.ScanWords)
 	n := scanInt()
@@ -43,13 +80,18 @@ func main() {
 	t := scanInt()
 	// fmt.Printf("%d %d %d\n", n, s, t)
 
+	adlist := initAdlist(n)
 	for i := 0; i < n; i++ {
 		v := scanInt()
+		a := make([]int, v)
 		for i := 0; i < v; i++ {
-			a := scanInt()
-
+			a[i] = scanInt()
 		}
+		adlist.l[i] = a
 	}
+	paths := adlist.walkGraphDfsStartToGoal(s, t, true)
+	fmt.Printf("%d\n", len(paths))
+	printWithSpace(paths)
 }
 
 var sc = bufio.NewScanner(os.Stdin)
